@@ -205,7 +205,7 @@ namespace DocLib.Html {
 		public override void Visit (string text)
 		{
 			if (!string.IsNullOrEmpty (text))
-				(currentRunFormat ?? currentBlock).Add (new XText (text));
+				AddToCurrentRun (new XText (text));
 		}
 
 		public override void Visit (DocLib.Ast.Image image)
@@ -215,10 +215,22 @@ namespace DocLib.Html {
 			var fileName = Path.ChangeExtension (image.Name, "png");
 			try {
 				image.Bitmap.Save (Path.Combine (imagesDir, fileName), ImageFormat.Png);
-				(currentRunFormat ?? currentBlock).Add (new XElement ("img", new XAttribute ("src", "Images/" + fileName)));
+
+				// Web URL
+				fileName = "Images/" + fileName;
+				AddToCurrentRun (
+					new XElement ("a", new XAttribute ("href", fileName),
+						new XElement ("img", new XAttribute ("src", fileName))
+					)
+				);
 			} catch (Exception e) {
 				Console.Error.WriteLine (e);
 			}
+		}
+
+		void AddToCurrentRun (object obj)
+		{
+			(currentRunFormat ?? currentBlock).Add (obj);
 		}
 	}
 
