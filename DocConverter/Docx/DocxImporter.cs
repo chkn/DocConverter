@@ -74,11 +74,28 @@ namespace DocLib.Docx {
 			foreach (var ppr in elem.Elements (w + "pPr"))
 				ImportParagraphProperties (block.Style, ppr);
 
-			foreach (var rElem in elem.Elements (w + "r")) {
+			foreach (var rElem in elem.Elements()) {
 				var run = new Run ();
+				if (rElem.Name == w + "hyperlink"){
+					ImportHyperlink (run, rElem);
+				}
 				ImportRun (run, rElem);
 				block.Runs.Add (run);
 			}
+		}
+
+		void ImportHyperlink (Run run, XElement elem)
+		{
+			var rid = (string)elem.Attribute (r + "id");
+			if (rid == null){
+				throw new DocxFormatException ("No id found on Hyperlink");
+			}
+			var rElem = GetRelationship (rid);
+			if (rElem == null){
+				throw new DocumentFormatException ("No relationship found");
+			}
+
+			run.Hyperlink = (string)rElem.Attribute ("Target");
 		}
 
 		void ImportRun (Run run, XElement elem)

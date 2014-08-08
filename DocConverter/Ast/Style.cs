@@ -19,6 +19,7 @@ namespace DocLib.Ast {
 		Code,
 		UIItem,
 		BulletList,
+		Hyperlink,
 
 		// These are named arbitrarily
 		NumberedList

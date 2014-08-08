@@ -129,22 +129,18 @@ namespace DocLib.Html {
 			switch (block.Style.Type) {
 
 			case Styles.Heading1:
+			case Styles.Heading2:
 				currentBlock = new XElement ("h1");
 				hadFirstHeading = true;
 				break;
 
-			case Styles.Heading2:
+			case Styles.Heading3:
 				currentBlock = new XElement ("h2");
 				hadFirstHeading = true;
 				break;
 
-			case Styles.Heading3:
-				currentBlock = new XElement ("h3");
-				hadFirstHeading = true;
-				break;
-
 			case Styles.Heading4:
-				currentBlock = new XElement ("h4");
+				currentBlock = new XElement ("h3");
 				hadFirstHeading = true;
 				break;
 
@@ -185,21 +181,35 @@ namespace DocLib.Html {
 
 		public override void Visit (Run run)
 		{
+			XElement container = null;
+
 			if (currentRunFormat != null)
 				throw new Exception ("currentRunFormat != null");
 
 			switch (run.Style.Type) {
 
 			case Styles.Code:
-				currentRunFormat = new XElement ("code");
+				container = currentRunFormat = new XElement ("code");
 				break;
 
 			}
-			base.Visit (run);
-			if (currentRunFormat != null) {
-				currentBlock.Add (currentRunFormat);
-				currentRunFormat = null;
+
+			if (!String.IsNullOrEmpty(run.Hyperlink)){
+				if (container != null)
+					container = new XElement ("a", container);
+				else
+					container = new XElement ("a");
+
+				container.SetAttributeValue ("href", run.Hyperlink);
 			}
+
+
+			base.Visit (run);
+			if (container != null) {
+				currentBlock.Add (container);
+			}
+			currentRunFormat = null;
+
 		}
 
 		public override void Visit (string text)

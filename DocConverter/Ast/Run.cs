@@ -22,6 +22,11 @@ namespace DocLib.Ast {
 			set;
 		}
 
+		public string Hyperlink {
+			get;
+			set;
+		}
+
 		public Run ()
 		{
 			Style = new Style ();
